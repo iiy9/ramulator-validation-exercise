@@ -1,0 +1,11 @@
+*.o
+*.out
+__pycache__/
+*.pyc
+.DS_Store
+build/
+results/
+ramulator1/
+ramulator2/
+Dockerfile
+taslak.md
