@@ -18,13 +18,14 @@ with open(temp_config_file, 'w') as f:
 os.chdir(os.path.join(os.path.dirname(__file__), ".."))
 
 # write to file to avoid buffer deadlock
-log_file = "test_output.log"
+log_file = "DDR4.stats"
 with open(log_file, 'w') as f:
     proc = subprocess.Popen([ramulator2_bin, "-f", temp_config_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text = True)
-    # Print output in real-time
+    # Print output in real-time and write to file
     output = ""
     for line in proc.stdout:
         print(line, end="")
+        f.write(line)
         output += line
     
     try:
@@ -32,9 +33,6 @@ with open(log_file, 'w') as f:
     except subprocess.TimeoutExpired:
         proc.kill()
         print("Ramulator2 timeout expired")
-
-with open(log_file, 'r') as f:
-    output = f.read()
 
 print("=== OUTPUT ===")
 print(output)
