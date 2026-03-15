@@ -92,7 +92,7 @@ The validation test ensures that Ramulator2 correctly simulates CPU traces and p
 
 These metrics provide a sanity check for the memory system simulation. They indicate whether the simulation is running correctly, whether requests are being handled as expected. Monitoring these ensures that Ramulator2 is producing reliable results.
 
-### Selected Metrics and The Results
+### Observed Metrics
 
 From the validation test output, the following metrics were observed:
 
