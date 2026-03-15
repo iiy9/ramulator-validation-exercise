@@ -14,19 +14,23 @@ git clone https://github.com/CMU-SAFARI/ramulator.git
 git clone https://github.com/CMU-SAFARI/ramulator2.git
 ```
 
+**Note**: Please build Ramulator and Ramulator2 following their own README instructions before continuing.
+
 Before running the test, make sure to unzip all trace files and copy the files to the correct directory used in the simulation:
 
 ```bash
-cd ramulator
-gunzip -k cputraces/401.bzip2.gz
-gunzip -k cputraces/403.gcc.gz
-gunzip -k cputraces/429.mcf.gz
+cd ramulator/cputraces
+gunzip -k 401.bzip2.gz
+gunzip -k 403.gcc.gz
+gunzip -k 429.mcf.gz
+mkdir ../../ramulator2/cputraces/
 cp 401.bzip2 403.gcc 429.mcf ../../ramulator2/cputraces/
 ```
 
 ```bash
-cp ../validation_test.py ../ramulator2/tests/
-cp ../validation_config.yaml ../ramulator2/
+cd ../../ramulator2/ && mkdir ./tests
+cp ../tests/validation_test.py ./tests/
+cp ../validation_config.yaml ./
 ```
 
 ## Running the Validation Test
@@ -34,11 +38,12 @@ cp ../validation_config.yaml ../ramulator2/
 After copying the test script and config, you can run the validation test in Ramulator2 using:
 
 ```bash
-cd ramulator2
 python3 tests/validation_test.py
 ```
 
 This will execute the test and sanity checks in the terminal. The test will pass or fail based on the validation of these metrics.
+
+You can also check the generated simulation statistics in `./ramulator2/DDR4.stats`.
 
 ## Steps Performed
 
