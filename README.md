@@ -62,7 +62,7 @@ You can also check the generated simulation statistics in `./ramulator2/DDR4.sta
    - Observed the execution and verified that statistics were written to `DDR4.stats`.
 
 2. **Ramulator2 Test Preparation**
-   - Reviewed the files in `ramulator2/src/test` and saw that they are not relevant to this exercise.
+   - Reviewed the files in `ramulator2/src/test` and observed that it was unrelated to trace validation.
    - Created `validation_config.yaml` with settings similar to Ramulator1 DDR4 configuration.
    - Wrote `validation_test.py` script that:
      - Runs Ramulator2 using the specified config.
