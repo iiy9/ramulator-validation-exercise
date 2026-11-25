@@ -43,6 +43,8 @@ python3 tests/validation_test.py
 
 This will execute the test and sanity checks in the terminal. The test will pass or fail based on the validation of these metrics.
 
+The test fails if the simulator crashes, runs longer than `RAMULATOR_TIMEOUT` seconds (default 3600), or if any metric is missing.
+
 You can also check the generated simulation statistics in `./ramulator2/DDR4.stats`.
 
 ## Steps Performed

@@ -1,6 +1,11 @@
-import subprocess
 import os
+import subprocess
+import sys
+import threading
+
 import yaml
+
+TIMEOUT_S = int(os.environ.get("RAMULATOR_TIMEOUT", "3600"))
 
 config_file = os.path.join(os.path.dirname(__file__), "..", "validation_config.yaml")
 ramulator2_bin = os.path.join(os.path.dirname(__file__), "..", "ramulator2")
@@ -19,20 +24,33 @@ os.chdir(os.path.join(os.path.dirname(__file__), ".."))
 
 # write to file to avoid buffer deadlock
 log_file = "DDR4.stats"
+timed_out = threading.Event()
 with open(log_file, 'w') as f:
-    proc = subprocess.Popen([ramulator2_bin, "-f", temp_config_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text = True)
+    proc = subprocess.Popen([ramulator2_bin, "-f", temp_config_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+    def stop():
+        timed_out.set()
+        proc.kill()
+
+    # The timer also covers a simulator that hangs without printing anything
+    timer = threading.Timer(TIMEOUT_S, stop)
+    timer.start()
     # Print output in real-time and write to file
     output = ""
     for line in proc.stdout:
         print(line, end="")
         f.write(line)
         output += line
-    
-    try:
-        proc.wait(timeout=60)  # wait for 60 seconds
-    except subprocess.TimeoutExpired:
-        proc.kill()
-        print("Ramulator2 timeout expired")
+    proc.wait()
+    timer.cancel()
+
+if os.path.exists(temp_config_file):
+    os.remove(temp_config_file)
+
+if timed_out.is_set():
+    sys.exit(f"FAIL: Ramulator2 did not finish within {TIMEOUT_S} s")
+if proc.returncode != 0:
+    sys.exit(f"FAIL: Ramulator2 exited with code {proc.returncode}")
 
 print("=== OUTPUT ===")
 print(output)
@@ -60,14 +78,11 @@ for key, check, msg in [
     ("row_hits_0", lambda x: x >= 0, "Row hits cannot be negative"),
     ("row_misses_0", lambda x: x >= 0, "Row misses cannot be negative")
 ]:
-    if key in metrics:
-        assert check(metrics[key]), msg
+    if key not in metrics:
+        sys.exit(f"FAIL: {key} is missing from the output")
+    if not check(metrics[key]):
+        sys.exit(f"FAIL: {msg}")
 
 print("Ramulator2 test passed. Metrics collected:")
 for k, v in metrics.items():
     print(f"{k}: {v}")
-
-# Delete temporary yaml
-if os.path.exists(temp_config_file):
-    os.remove(temp_config_file)
-    print(f"Temporary config file {temp_config_file} deleted.")
